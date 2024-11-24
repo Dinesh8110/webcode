@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="emp_detail.css">
+</head>
+<body>
+    <div ng-controller="ctrl" class="emp_details">
+        <div class="emp_table">
+        <h2>Employee Details of DBM</h2>
+            
+        <!-- <input type="number" placeholder="Enter salary of dinesh to change " ng-model="data[0].salary"> -->
+        <input type="text" ng-model="search" placeholder="Search for Employee" "> 
+
+         {{ greeting }}
+
+        <table border="1" class="e_detail">
+            <tr>
+                <th>EID</th>
+                <th>ENAME</th>
+                <th>AGE</th>
+                <th>DEPARTMENT</th>
+                <th>SALARY</th>
+            </tr>
+            <tr ng-repeat="data in records | filter:search | orderBy:'ename' ">
+                <td>{{data.eid}}</td>
+                <td>{{data.ename}}</td>
+                <td>{{data.age}}</td>
+                <td>{{data.dept}}</td>
+                <td>{{data.salary | currency:"INR "}}</td>
+                <td>
+                    <button ng-click="deleterecord(data.eid)">Delete</button>
+                    
+                </td>
+            </tr>
+        </table>
+
+        <h2>Enter input record to add to table</h2>
+        <input type="number" ng-model="id">
+        <input type="text" ng-model="name">
+        <input type="number" ng-model="age">
+        <input type="text" ng-model="dept">
+        <input type="number" ng-model="sal">
+        
+        <button ng-click="addrecord()">Add to table</button>
+        <button ng-click="updaterecord()">Update</button>
+        {{resp1}}
+        
+    </div>
+
+    </div>
+
+    <script>
+        var app = angular.module("app",[]);
+        app.controller("ctrl",function($scope,$http,myser){
+            
+            
+            $http.get("http://localhost:3000/edetails")
+            .then(function(response){
+                $scope.records = response.data;
+            },function(err){
+                console.log(err);
+            });
+
+
+
+            $scope.greeting = "Hello world";
+            $scope.greetchange = function(){
+                $scope.greeting = myser.hello($scope.search);
+            };
+
+            $scope.addrecord = function(){
+                var newrd = {
+                    eid:$scope.id,
+                    ename:$scope.name,
+                    age:$scope.age,
+                    dept:$scope.dept,
+                    salary:$scope.sal
+                };
+
+                $http.post("http://localhost:3000/edetails",newrd)
+                .then(function(response){
+                    $scope.records.push(newrd);
+                    $scope.resp1 = response.data;
+                    
+                },function(err){
+                    console.log(err);
+                });
+
+            };
+
+
+            $scope.deleterecord = function(id) {
+                $http.delete("http://localhost:3000/edetails/" + id)
+                    .then(function(response) {
+                        $scope.records = $scope.records.filter(record => record.eid !== id);
+                    }, function(err) {
+                        console.log(err);
+                    });
+            };
+
+            $scope.updaterecord = function(){
+                var newrd = {
+                    eid:$scope.id,
+                    ename:$scope.name,
+                    age:$scope.age,
+                    dept:$scope.dept,
+                    salary:$scope.sal
+                };
+
+                $http.put("http://localhost:3000/edetails/"+$scope.id,newrd)
+                .then(function(response){
+                   const index = $scope.records.findIndex(record => record.eid === $scope.id);
+                   if(index!== -1){
+                    $scope.records[index] = newrd;
+                   }
+                    $scope.resp1 = response.data;
+                }, function(err){
+                    console.log(err);
+                });
+
+            }
+            
+        });
+
+        app.service("myser",function(){
+            this.hello = function(name){
+                return "Hello "+name+".";
+            };
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE students [
+    <!ELEMENT students (student+)>
+    <!ELEMENT student (name,age,course,grade)>
+    <!ATTLIST student id ID #REQUIRED>
+    <!ELEMENT name (#PCDATA)>
+    <!ELEMENT age (#PCDATA)>
+    <!ELEMENT course (#PCDATA)>
+    <!ELEMENT grade (#PCDATA)>    
+]>
+<students>
+   <student id="1">
+      <name>Dinesh</name>
+      <age>20</age>
+      <course>Web technology</course>
+      <grade>O</grade>
+   </student>
+   <student id="2">
+      <name>kamal</name>
+      <age>18</age>
+      <course>oop</course>
+      <grade>A+</grade>
+      <phone>8220678756</phone>
+   </student>
+   <student id="3">
+      <name>sankar</name>
+      <age>20</age>
+      <course>security</course>
+      <grade>O</grade>
+   </student>
+</students>

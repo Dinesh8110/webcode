@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="emp_details_NoDB.css">
+</head>
+<body>
+    <div ng-controller="ctrl" class="emp_details">
+        <div class="emp_table">
+            <h2>Employee Details</h2>
+
+            <!-- Search bar -->
+            <input type="text" ng-model="search" placeholder="Search for Employee">
+
+            {{ greeting }}
+
+            <!-- Employee Table -->
+            <table border="1" class="e_detail">
+                <tr>
+                    <th>EID</th>
+                    <th>ENAME</th>
+                    <th>AGE</th>
+                    <th>DEPARTMENT</th>
+                    <th>SALARY</th>
+                    <th>ACTIONS</th>
+                </tr>
+                <tr ng-repeat="data in records | filter:search | orderBy:'ename' ">
+                    <td>{{data.eid}}</td>
+                    <td>{{data.ename}}</td>
+                    <td>{{data.age}}</td>
+                    <td>{{data.dept}}</td>
+                    <td>{{data.salary | currency:"INR "}}</td>
+                    <td>
+                        <button ng-click="deleterecord(data.eid)">Delete</button>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Add/Update Record Form -->
+            <h2>Enter input record to add/update table</h2>
+            <input type="number" ng-model="id" placeholder="Enter EID">
+            <input type="text" ng-model="name" placeholder="Enter Name">
+            <input type="number" ng-model="age" placeholder="Enter Age">
+            <input type="text" ng-model="dept" placeholder="Enter Department">
+            <input type="number" ng-model="sal" placeholder="Enter Salary">
+            
+            <button ng-click="addrecord()">Add Record</button>
+            <button ng-click="updaterecord()">Update Record</button>
+
+            {{resp1}}
+
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module("app",[]);
+
+        // Service for managing employee records
+        app.service("EmployeeService", function() {
+            // In-memory store of employee records
+            var records = [
+                {eid: 101, ename: "Dinesh", age: 30, dept: "HR", salary: 50000},
+                {eid: 102, ename: "Rahul", age: 25, dept: "Engineering", salary: 60000}
+            ];
+
+            // Get all records
+            this.getRecords = function() {
+                return records;
+            };
+
+            // Add a new record
+            this.addRecord = function(newRecord) {
+                records.push(newRecord);
+            };
+
+            // Delete a record by EID
+            this.deleteRecord = function(eid) {
+                records = records.filter(record => record.eid !== eid);
+            };
+
+            // Update an existing record
+            this.updateRecord = function(updatedRecord) {
+                const index = records.findIndex(record => record.eid === updatedRecord.eid);
+                if (index !== -1) {
+                    records[index] = updatedRecord;
+                }
+            };
+        });
+
+        // Controller to handle UI logic
+        app.controller("ctrl", function($scope, EmployeeService) {
+            // Fetch records from service
+            $scope.records = EmployeeService.getRecords();
+
+            // Greeting message
+            $scope.greeting = "Welcome to Employee Management";
+
+            // Add new record
+            $scope.addrecord = function() {
+                var newrd = {
+                    eid: $scope.id,
+                    ename: $scope.name,
+                    age: $scope.age,
+                    dept: $scope.dept,
+                    salary: $scope.sal
+                };
+
+                // Add new employee to records through service
+                EmployeeService.addRecord(newrd);
+                $scope.records = EmployeeService.getRecords(); // Update the scope with new data
+                $scope.resp1 = "Record added successfully!";
+            };
+
+            // Delete record
+            $scope.deleterecord = function(id) {
+                // Delete the record from service
+                EmployeeService.deleteRecord(id);
+                $scope.records = EmployeeService.getRecords(); // Update the scope with new data
+                $scope.resp1 = "Record deleted successfully!";
+            };
+
+            // Update existing record
+            $scope.updaterecord = function() {
+                var updatedrd = {
+                    eid: $scope.id,
+                    ename: $scope.name,
+                    age: $scope.age,
+                    dept: $scope.dept,
+                    salary: $scope.sal
+                };
+
+                // Update the record through service
+                EmployeeService.updateRecord(updatedrd);
+                $scope.records = EmployeeService.getRecords(); // Update the scope with new data
+                $scope.resp1 = "Record updated successfully!";
+            };
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Bookstore SYSTEM "bsDTD.dtd">
+<Bookstore>
+  <book>
+     <title>JAVA</title>
+     <author>dinesh</author>
+     <year>2020</year>
+  </book>
+  <book>
+     <title>python</title>
+     <author>kamal</author>
+     <year>2022</year>
+     <price>250</price> 
+  </book>
+  <book>
+     <title>DataStructure</title>
+     <author>sankar</author>
+     <year>2023</year>
+     <name>sam</name>
+  </book>
+</Bookstore>

@@ -1,0 +1,229 @@
+frontend:
+
+<!-- <!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="emp_detail.css">
+</head>
+<body>
+    <div ng-controller="ctrl" class="emp_details">
+        <div class="emp_table">
+            <h2>Employee Details</h2>
+            <input type="text" ng-model="search" placeholder="Search for Employee">
+            {{ greeting }}
+
+            <table border="1" class="e_detail">
+                <tr>
+                    <th>EID</th>
+                    <th>ENAME</th>
+                    <th>AGE</th>
+                    <th>DEPARTMENT</th>
+                    <th>SALARY</th>
+                    <th>ACTIONS</th>
+                </tr>
+                <tr ng-repeat="data in records | filter:search | orderBy:'ename'">
+                    <td>{{data.eid}}</td>
+                    <td>{{data.ename}}</td>
+                    <td>{{data.age}}</td>
+                    <td>{{data.dept}}</td>
+                    <td>{{data.salary | currency:"INR "}}</td>
+                    <td>
+                        <button ng-click="deleterecord(data._id)">Delete</button>
+                        <button ng-click="editrecord(data)">Edit</button>
+                    </td>
+                </tr>
+            </table>
+
+            <h2>Enter input record to add to table</h2>
+            <input type="number" ng-model="id" placeholder="EID">
+            <input type="text" ng-model="name" placeholder="ENAME">
+            <input type="number" ng-model="age" placeholder="AGE">
+            <input type="text" ng-model="dept" placeholder="DEPARTMENT">
+            <input type="number" ng-model="sal" placeholder="SALARY">
+            
+            <button ng-click="addrecord()">Add to table</button>
+            <button ng-click="updaterecord()">Update</button>
+            {{resp1}}
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module("app", []);
+        app.controller("ctrl", function($scope, $http) {
+
+            // Fetching initial records
+            $http.get("http://localhost:3000/edetails")
+                .then(function(response) {
+                    $scope.records = response.data;
+                }, function(err) {
+                    console.log(err);
+                });
+
+            $scope.addrecord = function() {
+                var newrd = {
+                    eid: $scope.id,
+                    ename: $scope.name,
+                    age: $scope.age,
+                    dept: $scope.dept,
+                    salary: $scope.sal
+                };
+
+                // Add new record to database
+                $http.post("http://localhost:3000/edetails", newrd)
+                    .then(function(response) {
+                        $scope.records.push(response.data); // Adding the response from backend
+                        $scope.resp1 = response.data;
+                    }, function(err) {
+                        console.log(err);
+                    });
+            };
+
+            $scope.deleterecord = function(id) {
+                // Delete record by _id
+                $http.delete("http://localhost:3000/edetails/" + id)
+                    .then(function(response) {
+                        // Remove the record from the list after deletion
+                        $scope.records = $scope.records.filter(record => record._id !== id);
+                    }, function(err) {
+                        console.log(err);
+                    });
+            };
+
+            $scope.updaterecord = function() {
+                var updatedRecord = {
+                    ename: $scope.name,
+                    age: $scope.age,
+                    dept: $scope.dept,
+                    salary: $scope.sal
+                };
+
+                // Update record by _id
+                $http.put("http://localhost:3000/edetails/" + $scope.id, updatedRecord)
+                    .then(function(response) {
+                        // Find the index of the record being updated
+                        const index = $scope.records.findIndex(record => record._id === $scope.id);
+                        if (index !== -1) {
+                            // Update the record locally
+                            $scope.records[index] = { ...$scope.records[index], ...updatedRecord };
+                        }
+                        $scope.resp1 = response.data;
+                    }, function(err) {
+                        console.log(err);
+                    });
+            };
+
+            // Edit a record to pre-populate input fields for updating
+            $scope.editrecord = function(data) {
+                $scope.id = data.eid;
+                $scope.name = data.ename;
+                $scope.age = data.age;
+                $scope.dept = data.dept;
+                $scope.sal = data.salary;
+            };
+        });
+    </script>
+</body>
+</html> -->
+
+
+
+
+
+backend:
+
+
+
+const express = require("express");
+const cors = require("cors");
+const { MongoClient, ObjectId } = require("mongodb");
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// MongoDB Connection
+const uri = "mongodb://localhost:27017"; // Update this if using MongoDB Atlas or another host
+const client = new MongoClient(uri);
+const dbName = "emp_details";
+
+let db, collection;
+
+// Connect to MongoDB
+client.connect()
+    .then(() => {
+        console.log("Connected to MongoDB");
+        db = client.db(dbName); // Select the database
+        collection = db.collection("edetail"); // Select the collection
+    })
+    .catch(err => {
+        console.error("Failed to connect to MongoDB", err);
+    });
+
+// Routes
+
+// GET: Fetch all employee details
+app.get("/edetails", async (req, res) => {
+    try {
+        const records = await collection.find().toArray(); // Fetch all documents
+        res.json(records);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching data");
+    }
+});
+
+// POST: Add a new employee record
+app.post("/edetails", async (req, res) => {
+    const newrd = req.body;
+
+    try {
+        const result = await collection.insertOne(newrd); // Insert a new document
+        res.json("record inserted successfully"); // Return the inserted document with _id
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error inserting record");
+    }
+});
+
+// DELETE: Delete an employee record by ID
+app.delete("/edetails/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        await collection.deleteOne({ _id: new ObjectId(id) }); // Delete the document by ObjectId
+        res.send("Record deleted successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error deleting record");
+    }
+});
+
+// PUT: Update an employee record by ID
+app.put("/edetails/:id", async (req, res) => {
+    const id = req.params.id;
+    const { ename, age, dept, salary } = req.body;
+
+    try {
+        await collection.updateOne(
+            { _id: new ObjectId(id) }, // Find the document by ObjectId
+            { $set: { ename, age, dept, salary } } // Update the fields
+        );
+        res.send("Record updated successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error updating record");
+    }
+});
+
+// Start the server
+app.listen(3000, () => {
+    console.log("Server running on port 3000...");
+});
+
+

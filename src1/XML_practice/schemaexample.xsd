@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="university">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="student" maxOccurs="3">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="name" type="xs:string"/>
+                            <xs:element name="age" type="xs:string"/>
+
+                            <xs:element name="major">
+                                <xs:simpleType>
+                                <xs:restriction base ="xs:string">
+                                  <xs:enumeration value="maths"/>
+                                  <xs:enumeration value="physics"/>
+                                  <xs:enumeration value="chemistry"/>
+                                  <xs:enumeration value="computer science"/>
+                                </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                            <xs:element name="gender">
+                                <xs:simpleType>
+                                <xs:restriction base ="xs:string">
+                                  <xs:enumeration value="male"/>
+                                  <xs:enumeration value="female"/>
+                                </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+    </xs:complexType>
+    </xs:element>
+</xs:schema>
+
+
+<!-- corresponding xml code:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<university>
+    <student>
+        <name>John Doe</name>
+        <age>21</age>
+        <major>physics</major>
+        <gender>male</gender>
+    </student>
+    <student>
+        <name>Jane Smith</name>
+        <age>19</age>
+        <major>Maths</major>
+        <gender>female</gender>
+    </student>
+</university> -->
